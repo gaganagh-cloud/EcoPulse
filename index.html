@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoPulse - Community Climate & Resource Watch</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- FontAwesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Google Fonts: Plus Jakarta Sans for ultra clean readability -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            emerald: {
+              450: '#10b981',
+              950: '#022c22',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom scrollbar and glass effect */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #020617;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #10b981;
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans flex flex-col selection:bg-emerald-500 selection:text-slate-950">
+
+  <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-xl border-b border-slate-800 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3 flex items-center justify-between gap-2">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-tr from-emerald-500 via-teal-400 to-cyan-400 flex items-center justify-center text-slate-950 shadow-lg shadow-emerald-500/25 font-black text-xl flex-shrink-0">
+          <i class="fa-solid fa-leaf"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xl sm:text-2xl font-extrabold tracking-tight text-white">EcoPulse</span>
+            <span class="text-[10px] uppercase font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">AI Zero-HW</span>
+          </div>
+          <p class="text-[11px] text-slate-400 hidden md:block" id="navSubtitle">Community Climate & Resource Watch</p>
+        </div>
+      </div>
+
+      <!-- Actions & Multi-Language Switcher (6 Languages) -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        
+        <!-- Voice Audio Guide Button -->
+        <button onclick="speakVoiceGuide()" class="p-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-emerald-400 border border-slate-700/80 transition flex items-center gap-1.5 text-xs font-semibold hover:border-emerald-500/40" title="Listen instructions in current language">
+          <i class="fa-solid fa-volume-high text-sm"></i>
+          <span class="hidden sm:inline" id="btnVoiceLabel">Voice Guide</span>
+        </button>
+
+        <!-- 6-Language Dropdown -->
+        <div class="relative">
+          <select id="languageSelector" onchange="switchLanguage(this.value)" class="bg-slate-900/95 border border-emerald-500/40 text-emerald-300 text-xs sm:text-sm font-bold rounded-xl px-3 py-2 pr-8 focus:ring-2 focus:ring-emerald-400 focus:outline-none cursor-pointer hover:bg-slate-800 transition">
+            <option value="en">English</option>
+            <option value="kn" selected>ಕನ್ನಡ (Kannada)</option>
+            <option value="hi">हिंदी (Hindi)</option>
+            <option value="ta">தமிழ் (Tamil)</option>
+            <option value="te">తెలుగు (Telugu)</option>
+            <option value="ml">മലയാളം (Malayalam)</option>
+          </select>
+        </div>
+
+        <!-- 3-Minute Video Pitch Guide Trigger -->
+        <button onclick="togglePitchModal(true)" class="p-2.5 rounded-xl bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 border border-indigo-500/30 transition text-xs font-bold flex items-center gap-1.5" title="Hackathon 3-Min Pitch Script">
+          <i class="fa-solid fa-video text-indigo-400"></i>
+          <span class="hidden lg:inline" id="btnPitchLabel">3-Min Pitch Guide</span>
+        </button>
+
+        <!-- Direct CTA to Report -->
+        <a href="#report-section" class="bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-extrabold px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm transition shadow-lg shadow-emerald-500/20 flex items-center gap-1.5 flex-shrink-0">
+          <i class="fa-solid fa-circle-exclamation text-xs"></i>
+          <span id="navBtnReport">Report Waste</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <section class="relative overflow-hidden pt-10 pb-14 border-b border-slate-800/80 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(16,185,129,0.15),rgba(255,255,255,0))]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-10">
+      
+      <!-- Hero Left Text -->
+      <div class="max-w-2xl text-center lg:text-left">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-semibold mb-5 shadow-inner">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span id="heroBadgeText">100% Smartphone Powered • Zero Sensors / Hardware Needed</span>
+        </div>
+        <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight sm:leading-[1.15]" id="heroHeadline">
+          Community Crowdsourced Climate & Resource Defense.
+        </h1>
+        <p class="mt-4 text-sm sm:text-base text-slate-300 leading-relaxed max-w-xl mx-auto lg:mx-0" id="heroSummary">
+          Empowering citizens and institutions across India to spot leaks, stop daytime streetlights, and halt carbon dumping instantly with geotagged citizen reports.
+        </p>
+
+        <!-- Quick Buttons -->
+        <div class="mt-7 flex flex-wrap gap-3 justify-center lg:justify-start">
+          <a href="#report-section" class="px-5 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition flex items-center gap-2 shadow-lg shadow-emerald-500/30">
+            <i class="fa-solid fa-camera"></i> <span id="heroCtaReport">Report an Issue (Instant)</span>
+          </a>
+          <a href="#calculator-section" class="px-5 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700/80 font-semibold text-sm transition flex items-center gap-2">
+            <i class="fa-solid fa-calculator text-cyan-400"></i> <span id="heroCtaCalc">Audit Carbon Impact</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Community Impact Metrics -->
+      <div class="grid grid-cols-2 gap-3.5 w-full sm:max-w-md mx-auto lg:mx-0 flex-shrink-0">
+        <div class="glass-card p-5 rounded-2xl text-center border-l-4 border-l-cyan-400">
+          <p class="text-2xl sm:text-3xl font-extrabold text-cyan-400 tracking-tight" id="counterWater">482,000 L</p>
+          <p class="text-xs text-slate-400 mt-1 font-semibold" id="labelCardWater">Water Conserved</p>
+          <span class="text-[10px] text-cyan-400/80 font-mono">💧 1,240 leaks averted</span>
+        </div>
+
+        <div class="glass-card p-5 rounded-2xl text-center border-l-4 border-l-amber-400">
+          <p class="text-2xl sm:text-3xl font-extrabold text-amber-400 tracking-tight" id="counterPower">18,650 kWh</p>
+          <p class="text-xs text-slate-400 mt-1 font-semibold" id="labelCardPower">Power Saved</p>
+          <span class="text-[10px] text-amber-400/80 font-mono">⚡ ₹1.49L utility savings</span>
+        </div>
+
+        <div class="glass-card p-5 rounded-2xl text-center border-l-4 border-l-emerald-400">
+          <p class="text-2xl sm:text-3xl font-extrabold text-emerald-400 tracking-tight" id="counterResolved">248</p>
+          <p class="text-xs text-slate-400 mt-1 font-semibold" id="labelCardFixed">Hazards Resolved</p>
+          <span class="text-[10px] text-emerald-400/80 font-mono">✅ 91% Fix Rate</span>
+        </div>
+
+        <div class="glass-card p-5 rounded-2xl text-center border-l-4 border-l-indigo-400">
+          <p class="text-2xl sm:text-3xl font-extrabold text-indigo-400 tracking-tight" id="counterCo2">15.2 Tons</p>
+          <p class="text-xs text-slate-400 mt-1 font-semibold" id="labelCardCo2">CO₂ Prevented</p>
+          <span class="text-[10px] text-indigo-400/80 font-mono">🌲 760 Trees Equivalent</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-grow space-y-16">
+
+    <!-- SECTION 1: CITIZEN REPORTING FORM (Zero hardware, GPS auto-detect, photo preview) -->
+    <section id="report-section" class="scroll-mt-24">
+      <div class="glass-card rounded-3xl p-6 sm:p-9 shadow-2xl relative overflow-hidden border border-slate-800">
+        <div class="absolute -top-24 -right-24 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-3xl mb-8">
+          <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-400 mb-2">
+            <i class="fa-solid fa-bullhorn"></i> <span id="tagReportForm">Citizen Grievance & Resource Rescue</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-black text-white" id="titleReportForm">Report a Water, Power or Climate Hazard</h2>
+          <p class="text-slate-400 text-xs sm:text-sm mt-1" id="descReportForm">
+            Spotted a broken pipe, a daytime streetlight, or illegal waste burning? Fill this 20-second form. Our AI categorizes priority and pushes tickets to maintenance teams.
+          </p>
+        </div>
+
+        <form id="hazardForm" onsubmit="submitHazardReport(event)" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Category Selector -->
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2" id="labelFormCat">
+                1. Select Hazard Category
+              </label>
+              <select id="formCategory" required class="w-full bg-slate-950 border border-slate-700/80 text-slate-100 rounded-xl px-4 py-3 text-sm focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400 focus:outline-none transition cursor-pointer">
+                <option value="water_leak">💧 Water Pipe Fracture / Gushing Valve</option>
+                <option value="water_tank">🚰 Water Storage Tank Overflow</option>
+                <option value="streetlight_day">💡 Daytime Streetlights Left ON</option>
+                <option value="power_waste">⚡ Public HVAC / High Appliance Energy Waste</option>
+                <option value="waste_burn">🔥 Open Garbage / Plastic Waste Burning</option>
+                <option value="tree_hazard">🌳 Tree Felling / Urban Green Space Damage</option>
+              </select>
+            </div>
+
+            <!-- Severity Rating -->
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2" id="labelFormSeverity">
+                2. Urgency & Estimated Wastage
+              </label>
+              <select id="formSeverity" class="w-full bg-slate-950 border border-slate-700/80 text-slate-100 rounded-xl px-4 py-3 text-sm focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400 focus:outline-none transition cursor-pointer">
+                <option value="High" selected>🔴 Critical Surge (Severe water flood / high loss)</option>
+                <option value="Medium">🟡 Moderate (Continuous drip / multiple lamps)</option>
+                <option value="Low">🟢 Minor (Intermittent / early stage)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Geolocation GPS Auto-fetch -->
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-300" id="labelFormLocation">
+                3. Exact Location / Address
+              </label>
+              <button type="button" onclick="detectUserLocation()" class="text-xs text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-location-crosshairs"></i> <span id="btnAutoGps">Auto-Detect GPS</span>
+              </button>
+            </div>
+            <div class="relative">
+              <input type="text" id="formLocation" required placeholder="e.g. Near Bus Stand, Main Water Tank Road, Sector 4" class="w-full bg-slate-950 border border-slate-700/80 text-slate-100 rounded-xl px-4 py-3 text-sm focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400 focus:outline-none pr-28">
+              <span id="gpsLockedBadge" class="hidden absolute right-3 top-3 text-[11px] bg-emerald-500/20 text-emerald-400 px-2.5 py-0.5 rounded-full font-mono border border-emerald-500/30">GPS Verified</span>
+            </div>
+          </div>
+
+          <!-- Proof Upload (Camera / File preview) -->
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2" id="labelFormPhoto">
+              4. Evidence Photo (Phone Camera or Gallery)
+            </label>
+            <div class="border-2 border-dashed border-slate-800 hover:border-emerald-500/50 rounded-2xl p-5 text-center cursor-pointer transition bg-slate-950/60" onclick="document.getElementById('hazardFileInput').click()">
+              <input type="file" id="hazardFileInput" accept="image/*" class="hidden" onchange="previewUploadedImage(event)">
+              
+              <div id="dropPrompt">
+                <i class="fa-solid fa-camera text-3xl text-slate-500 mb-2"></i>
+                <p class="text-xs font-semibold text-slate-300" id="textTapCamera">Tap to capture or upload evidence photo</p>
+                <p class="text-[11px] text-slate-500">Supports JPEG, PNG from mobile cameras (up to 10MB)</p>
+              </div>
+
+              <div id="previewContainer" class="hidden flex items-center justify-center gap-4">
+                <img id="previewImg" src="" alt="Proof Preview" class="h-20 w-20 object-cover rounded-xl border-2 border-emerald-500 shadow-md">
+                <div class="text-left">
+                  <p class="text-xs font-bold text-emerald-400"><i class="fa-solid fa-circle-check"></i> Image Loaded!</p>
+                  <p class="text-[11px] text-slate-400" id="previewImgMeta">Captured for AI analysis</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Description and Submit -->
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2" id="labelFormNotes">
+              5. Quick Description / Remarks
+            </label>
+            <textarea id="formDescription" rows="2" placeholder="e.g. Water is spewing continuously across the road, causing mud pools and loss." class="w-full bg-slate-950 border border-slate-700/80 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400 focus:outline-none"></textarea>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="flex items-center justify-end">
+            <button type="submit" id="btnSubmitForm" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-sm rounded-xl transition shadow-xl shadow-emerald-500/25 flex items-center justify-center gap-2">
+              <i class="fa-solid fa-paper-plane"></i> <span>Submit Grievance to Ward</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Feedback Alert Banner -->
+        <div id="successNotification" class="hidden mt-6 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-circle-check text-2xl text-emerald-400"></i>
+            <div>
+              <p class="text-sm font-bold" id="msgSuccessTitle">Grievance Registered Successfully!</p>
+              <p class="text-xs text-emerald-400/80" id="msgSuccessBody">Ticket #EP-2026 created. Maintenance personnel and local ward volunteers notified.</p>
+            </div>
+          </div>
+          <button onclick="document.getElementById('successNotification').classList.add('hidden')" class="text-xs bg-emerald-500/20 px-3 py-1.5 rounded-lg font-bold hover:bg-emerald-500/30">Dismiss</button>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-6">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-cyan-400" id="tagAnalytics">Resource Intelligence</span>
+          <h2 class="text-2xl sm:text-3xl font-black text-white mt-1" id="titleAnalytics">Community Resource Savings & Incident Analytics</h2>
+        </div>
+        <p class="text-xs text-slate-400 mt-2 sm:mt-0 font-mono flex items-center gap-2">
+          <span class="h-2 w-2 rounded-full bg-emerald-400 animate-ping"></span> Live Dynamic Trends
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Chart 1: Weekly Water & Energy Saved (Line) -->
+        <div class="lg:col-span-2 glass-card rounded-3xl p-6 border border-slate-800">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-slate-200 flex items-center gap-2">
+              <i class="fa-solid fa-chart-line text-cyan-400"></i> <span id="titleChart1">Weekly Water Saved via Citizen Action (Liters)</span>
+            </h3>
+            <span class="text-[11px] font-mono text-cyan-300 bg-cyan-950/80 border border-cyan-800/80 px-2.5 py-0.5 rounded-full font-bold">+28% this week</span>
+          </div>
+          <div class="h-64 sm:h-72">
+            <canvas id="weeklySavingsChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 2: Hazard Distribution Doughnut -->
+        <div class="glass-card rounded-3xl p-6 border border-slate-800 flex flex-col justify-between">
+          <div>
+            <h3 class="text-sm font-bold text-slate-200 mb-1 flex items-center gap-2">
+              <i class="fa-solid fa-chart-pie text-amber-400"></i> <span id="titleChart2">Hazard Reports by Category</span>
+            </h3>
+            <p class="text-xs text-slate-400 mb-4" id="subtitleChart2">Aggregated community issues breakdown</p>
+            <div class="h-52 flex items-center justify-center">
+              <canvas id="categoryBreakdownChart"></canvas>
+            </div>
+          </div>
+          <div class="pt-4 border-t border-slate-800/80 text-[11px] text-slate-400 flex justify-between items-center">
+            <span>Average Resolution Speed:</span>
+            <span class="font-extrabold text-emerald-400">2.8 Hours</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="calculator-section" class="scroll-mt-24">
+      <div class="glass-card border border-emerald-500/20 rounded-3xl p-6 sm:p-9 shadow-2xl relative overflow-hidden">
+        <div class="max-w-3xl mb-8">
+          <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-400 mb-2">
+            <i class="fa-solid fa-calculator"></i> <span id="tagCalcSection">Interactive Impact Audit</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-black text-white" id="titleCalcSection">Community Carbon & Resource Savings Calculator</h2>
+          <p class="text-slate-400 text-xs sm:text-sm mt-1" id="descCalcSection">
+            Estimate how small citizen interventions (fixing leaking taps, switching off daytime lamps, turning off idle air conditioners) directly conserve natural resources and cut carbon.
+          </p>
+        </div>
+
+        <!-- Interactive Sliders / Inputs -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Input 1: Citizens / Campus Count -->
+          <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800">
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2" id="labelCalcPeople">
+              Community / Campus Size
+            </label>
+            <input type="number" id="calcPeopleInput" value="50" min="1" max="10000" class="w-full bg-slate-900 border border-slate-700 text-emerald-400 font-extrabold rounded-xl px-4 py-2.5 text-lg focus:outline-none focus:border-emerald-400" oninput="runCarbonCalculations()">
+            <p class="text-[11px] text-slate-500 mt-2" id="hintCalcPeople">Number of residents, students or staff</p>
+          </div>
+
+          <!-- Input 2: Leaks Fixed -->
+          <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800">
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2" id="labelCalcLeaks">
+              Leaking Faucets / Pipes Plugged
+            </label>
+            <input type="number" id="calcLeaksInput" value="6" min="0" max="500" class="w-full bg-slate-900 border border-slate-700 text-cyan-400 font-extrabold rounded-xl px-4 py-2.5 text-lg focus:outline-none focus:border-cyan-400" oninput="runCarbonCalculations()">
+            <p class="text-[11px] text-slate-500 mt-2" id="hintCalcLeaks">1 leaking tap = approx 40 Liters lost/day</p>
+          </div>
+
+          <!-- Input 3: Energy Idle Hours Cut -->
+          <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800">
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2" id="labelCalcHours">
+              Idle Power Hours Prevented / Day
+            </label>
+            <input type="number" id="calcHoursInput" value="4" min="0" max="24" class="w-full bg-slate-900 border border-slate-700 text-amber-400 font-extrabold rounded-xl px-4 py-2.5 text-lg focus:outline-none focus:border-amber-400" oninput="runCarbonCalculations()">
+            <p class="text-[11px] text-slate-500 mt-2" id="hintCalcHours">Daytime lights, unattended pumps & fans</p>
+          </div>
+        </div>
+
+        <!-- Calculated Live Metrics Display -->
+        <div class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="p-5 rounded-2xl bg-cyan-950/25 border border-cyan-500/30">
+            <p class="text-xs font-bold uppercase tracking-wider text-cyan-400 mb-1 flex items-center gap-1.5">
+              <i class="fa-solid fa-faucet-drip"></i> <span id="labelResWater">Monthly Water Conserved</span>
+            </p>
+            <p class="text-3xl font-black text-cyan-300" id="resWaterVal">37,200 Liters</p>
+            <p class="text-[11px] text-slate-400 mt-1 font-mono">≈ 1,860 standard water cans</p>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-amber-950/25 border border-amber-500/30">
+            <p class="text-xs font-bold uppercase tracking-wider text-amber-400 mb-1 flex items-center gap-1.5">
+              <i class="fa-solid fa-bolt"></i> <span id="labelResPower">Monthly Power Saved</span>
+            </p>
+            <p class="text-3xl font-black text-amber-300" id="resPowerVal">720 kWh</p>
+            <p class="text-[11px] text-slate-400 mt-1 font-mono">≈ ₹5,760 in community utility bills</p>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-emerald-950/25 border border-emerald-500/30">
+            <p class="text-xs font-bold uppercase tracking-wider text-emerald-400 mb-1 flex items-center gap-1.5">
+              <i class="fa-solid fa-leaf"></i> <span id="labelResCo2">Annual CO₂ Footprint Prevented</span>
+            </p>
+            <p class="text-3xl font-black text-emerald-300" id="resCo2Val">7.08 Tons</p>
+            <p class="text-[11px] text-slate-400 mt-1 font-mono">🌲 Equal to planting 354 trees</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-emerald-400" id="tagFeed">Verified Community Action</span>
+          <h2 class="text-2xl font-black text-white mt-1" id="titleFeed">Live Citizen Action Log & Heatmap Feed</h2>
+        </div>
+      </div>
+
+      <div class="glass-card rounded-3xl p-6 border border-slate-800">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="text-[11px] uppercase tracking-wider text-slate-400 bg-slate-950/80 border-b border-slate-800">
+              <tr>
+                <th class="py-3 px-4">Ticket ID</th>
+                <th class="py-3 px-4">Category</th>
+                <th class="py-3 px-4">Location</th>
+                <th class="py-3 px-4">Estimated Waste</th>
+                <th class="py-3 px-4">Status</th>
+                <th class="py-3 px-4 text-center">Citizen Upvotes</th>
+              </tr>
+            </thead>
+            <tbody id="incidentsTable" class="divide-y divide-slate-800/80 font-medium">
+              <!-- Dynamically populated or prepended upon submit -->
+              <tr class="hover:bg-slate-800/30 transition">
+                <td class="py-3.5 px-4 font-mono font-bold text-emerald-400">#EP-1049</td>
+                <td class="py-3.5 px-4 text-white">Water Tank Overflow</td>
+                <td class="py-3.5 px-4">Govt College Campus, B-Block</td>
+                <td class="py-3.5 px-4 text-cyan-300 font-mono">~1,800 L/hr</td>
+                <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">Resolved</span></td>
+                <td class="py-3.5 px-4 text-center">
+                  <button onclick="upvoteIncident(this)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-emerald-400 text-xs font-bold transition">
+                    <i class="fa-solid fa-thumbs-up"></i> <span>28</span>
+                  </button>
+                </td>
+              </tr>
+              <tr class="hover:bg-slate-800/30 transition">
+                <td class="py-3.5 px-4 font-mono font-bold text-emerald-400">#EP-1050</td>
+                <td class="py-3.5 px-4 text-white">Daytime Streetlight On (14 poles)</td>
+                <td class="py-3.5 px-4">2nd Cross, Ring Road Junction</td>
+                <td class="py-3.5 px-4 text-amber-300 font-mono">~4.2 kWh</td>
+                <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">Resolved</span></td>
+                <td class="py-3.5 px-4 text-center">
+                  <button onclick="upvoteIncident(this)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-emerald-400 text-xs font-bold transition">
+                    <i class="fa-solid fa-thumbs-up"></i> <span>41</span>
+                  </button>
+                </td>
+              </tr>
+              <tr class="hover:bg-slate-800/30 transition">
+                <td class="py-3.5 px-4 font-mono font-bold text-amber-400">#EP-1051</td>
+                <td class="py-3.5 px-4 text-white">Pipeline Joint Burst</td>
+                <td class="py-3.5 px-4">Under Metro Bridge Pillar 84</td>
+                <td class="py-3.5 px-4 text-rose-300 font-mono">~5,200 L/hr</td>
+                <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[10px] font-bold">Ward Dispatched</span></td>
+                <td class="py-3.5 px-4 text-center">
+                  <button onclick="upvoteIncident(this)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-emerald-400 text-xs font-bold transition">
+                    <i class="fa-solid fa-thumbs-up"></i> <span>67</span>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="border-t border-slate-800 pt-12">
+      <h2 class="text-xl sm:text-2xl font-bold text-white text-center mb-8" id="titleNoHardware">
+        Why EcoPulse Succeeds Without Costly Hardware or ESP32 Devices
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="p-6 glass-card rounded-2xl text-center border border-slate-800">
+          <div class="w-12 h-12 mx-auto rounded-2xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-xl mb-4">
+            <i class="fa-solid fa-users"></i>
+          </div>
+          <h3 class="font-bold text-white text-base mb-2" id="hwCol1Title">1. Citizen Crowdsourcing</h3>
+          <p class="text-xs text-slate-400" id="hwCol1Desc">Every student, resident, and municipal employee has a GPS-enabled camera phone, creating an instant distributed sensor network.</p>
+        </div>
+
+        <div class="p-6 glass-card rounded-2xl text-center border border-slate-800">
+          <div class="w-12 h-12 mx-auto rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl mb-4">
+            <i class="fa-solid fa-brain"></i>
+          </div>
+          <h3 class="font-bold text-white text-base mb-2" id="hwCol2Title">2. Algorithmic Triaging</h3>
+          <p class="text-xs text-slate-400" id="hwCol2Desc">Intelligent heuristics compute flow loss, prioritize severe leaks, and bundle proximate reports to avoid duplicates.</p>
+        </div>
+
+        <div class="p-6 glass-card rounded-2xl text-center border border-slate-800">
+          <div class="w-12 h-12 mx-auto rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl mb-4">
+            <i class="fa-solid fa-bullseye"></i>
+          </div>
+          <h3 class="font-bold text-white text-base mb-2" id="hwCol3Title">3. Rapid Ward Action</h3>
+          <p class="text-xs text-slate-400" id="hwCol3Desc">Direct dispatch to municipal ward plumbers and campus maintenance, closing tickets in hours instead of weeks.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="border-t border-slate-800 bg-slate-950 py-8 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+        <span class="text-slate-300 font-bold">EcoPulse</span> — Hackathon Climate & Sustainability Track
+      </div>
+      <p class="text-[11px] text-slate-400">UN SDG 6 (Clean Water) • SDG 11 (Sustainable Cities) • SDG 13 (Climate Action)</p>
+    </div>
+  </footer>
+
+  <div id="pitchModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="glass-card max-w-2xl w-full rounded-3xl p-6 sm:p-8 border border-indigo-500/30 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-video text-indigo-400 text-xl"></i>
+          <h3 class="text-lg font-bold text-white">3-Minute Video Demo Script (Hackathon Ready)</h3>
+        </div>
+        <button onclick="togglePitchModal(false)" class="text-slate-400 hover:text-white text-lg p-1">&times;</button>
+      </div>
+
+      <div class="space-y-4 text-xs sm:text-sm text-slate-300">
+        <p class="text-slate-400 text-xs">
+          Use this timestamped roadmap to record your 3-minute video using <strong>Win + G</strong> or OBS screen recorder:
+        </p>
+
+        <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+          <span class="font-bold text-indigo-400">0:00 - 0:40 | The Problem & Concept</span>
+          <p class="text-xs text-slate-400 mt-1">
+            "Respected judges, underground water leaks, tank overflows, and daytime streetlights waste millions of liters and energy units daily across Indian campuses and towns. Hardware sensors are too costly to install everywhere. Our solution is <strong>EcoPulse</strong>: a zero-hardware, citizen-powered platform."
+          </p>
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+          <span class="font-bold text-emerald-400">0:40 - 1:30 | Multilingual & Reporting Demo</span>
+          <p class="text-xs text-slate-400 mt-1">
+            Switch between <strong>Kannada, Hindi, Tamil, Telugu, Malayalam, and English</strong> to demonstrate complete accessibility for all citizens. Click "Auto-Detect GPS", snap/upload a photo, and submit a live leak grievance to show it instantly appearing on the table.
+          </p>
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+          <span class="font-bold text-cyan-400">1:30 - 2:15 | Impact Calculator & Analytics</span>
+          <p class="text-xs text-slate-400 mt-1">
+            Scroll down to the <strong>Sustainability & Carbon Calculator</strong>. Adjust the slider values to show real-time computation of water preserved, power saved, and annual metric tons of CO₂ emissions prevented.
+          </p>
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+          <span class="font-bold text-amber-400">2:15 - 3:00 | Scale, Roadmap & Conclusion</span>
+          <p class="text-xs text-slate-400 mt-1">
+            Highlight alignment with UN SDGs 6, 11, and 13. Explain how municipalities and university campuses can adopt this immediately with zero capital expenditure on IoT hardware. Thank the judges!
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-6 flex justify-end">
+        <button onclick="togglePitchModal(false)" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl transition">
+          Got it, Close Script
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 6-LANGUAGE DICTIONARY: English, Kannada, Hindi, Tamil, Telugu, Malayalam
+    const i18n = {
+      en: {
+        navSubtitle: "Community Climate & Resource Watch",
+        btnVoiceLabel: "Voice Guide",
+        btnPitchLabel: "3-Min Pitch Guide",
+        navBtnReport: "Report Waste",
+        heroBadgeText: "100% Smartphone Powered • Zero Sensors / Hardware Needed",
+        heroHeadline: "Community Crowdsourced Climate & Resource Defense.",
+        heroSummary: "Empowering citizens and institutions across India to spot leaks, stop daytime streetlights, and halt carbon dumping instantly with geotagged citizen reports.",
+        heroCtaReport: "Report an Issue (Instant)",
+        heroCtaCalc: "Audit Carbon Impact",
+        labelCardWater: "Water Conserved",
+        labelCardPower: "Power Saved",
+        labelCardFixed: "Hazards Resolved",
+        labelCardCo2: "CO₂ Prevented",
+        tagReportForm: "Citizen Grievance & Resource Rescue",
+        titleReportForm: "Report a Water, Power or Climate Hazard",
+        descReportForm: "Spotted a broken pipe, a daytime streetlight, or illegal waste burning? Fill this 20-second form. Our AI categorizes priority and pushes tickets to maintenance teams.",
+        labelFormCat: "1. Select Hazard Category",
+        labelFormSeverity: "2. Urgency & Estimated Wastage",
+        labelFormLocation: "3. Exact Location / Address",
+        btnAutoGps: "Auto-Detect GPS",
+        labelFormPhoto: "4. Evidence Photo (Phone Camera or Gallery)",
+        textTapCamera: "Tap to capture or upload evidence photo",
+        labelFormNotes: "5. Quick Description / Remarks",
+        btnSubmitForm: "Submit Grievance to Ward",
+        msgSuccessTitle: "Grievance Registered Successfully!",
+        msgSuccessBody: "Ticket created. Maintenance personnel and local ward volunteers notified.",
+        tagAnalytics: "Resource Intelligence",
+        titleAnalytics: "Community Resource Savings & Incident Analytics",
+        titleChart1: "Weekly Water Saved via Citizen Action (Liters)",
+        titleChart2: "Hazard Reports by Category",
+        subtitleChart2: "Aggregated community issues breakdown",
+        tagCalcSection: "Interactive Impact Audit",
+        titleCalcSection: "Community Carbon & Resource Savings Calculator",
+        descCalcSection: "Estimate how small citizen interventions (fixing leaking taps, switching off daytime lamps) directly conserve natural resources and cut carbon.",
+        labelCalcPeople: "Community / Campus Size",
+        hintCalcPeople: "Number of residents, students or staff",
+        labelCalcLeaks: "Leaking Faucets / Pipes Plugged",
+        hintCalcLeaks: "1 leaking tap = approx 40 Liters lost/day",
+        labelCalcHours: "Idle Power Hours Prevented / Day",
+        hintCalcHours: "Daytime lights, unattended pumps & fans",
+        labelResWater: "Monthly Water Conserved",
+        labelResPower: "Monthly Power Saved",
+        labelResCo2: "Annual CO₂ Footprint Prevented",
+        tagFeed: "Verified Community Action",
+        titleFeed: "Live Citizen Action Log & Heatmap Feed",
+        titleNoHardware: "Why EcoPulse Succeeds Without Costly Hardware or ESP32 Devices",
+        hwCol1Title: "1. Citizen Crowdsourcing",
+        hwCol1Desc: "Every student, resident, and municipal employee has a GPS-enabled camera phone, creating an instant distributed sensor network.",
+        hwCol2Title: "2. Algorithmic Triaging",
+        hwCol2Desc: "Intelligent heuristics compute flow loss, prioritize severe leaks, and bundle proximate reports to avoid duplicates.",
+        hwCol3Title: "3. Rapid Ward Action",
+        hwCol3Desc: "Direct dispatch to municipal ward plumbers and campus maintenance, closing tickets in hours instead of weeks.",
+        voiceText: "Welcome to EcoPulse. You can report leaking water pipes, daytime burning streetlights, and environmental hazards in your local community without any hardware."
+      },
+      kn: {
+        navSubtitle: "ಸಮುದಾಯದ ಹವಾಮಾನ ಮತ್ತು ಪರಿಸರ ಸಂರಕ್ಷಣೆ ವೇದಿಕೆ",
+        btnVoiceLabel: "ಧ್ವನಿ ಮಾರ್ಗದರ್ಶಿ",
+        btnPitchLabel: "3-ನಿಮಿಷ ಪಿಚ್ ಗೈಡ್",
+        navBtnReport: "ಸಮಸ್ಯೆ ವರದಿ ಮಾಡಿ",
+        heroBadgeText: "100% ಸ್ಮಾರ್ಟ್‌ಫೋನ್ ಸಾಕು • ಯಾವುದೇ ಹಾರ್ಡ್‌ವೇರ್ ಅಗತ್ಯವಿಲ್ಲ",
+        heroHeadline: "ಸಮುದಾಯದ ಸಹಭಾಗಿತ್ವದಲ್ಲಿ ನೀರು ಮತ್ತು ವಿದ್ಯುತ್ ಸಂರಕ್ಷಣೆ.",
+        heroSummary: "ಸೋರುವ ಪೈಪ್‌ಗಳು, ಹಗಲು ಉರಿಯುವ ಬೀದಿ ದೀಪಗಳು ಮತ್ತು ಕಸ ಸುಡುವುದನ್ನು ಮೊಬೈಲ್ ಮೂಲಕ ಫೋಟೋ ತೆಗೆದು ವರದಿ ಮಾಡಿ. ಸ್ಥಳೀಯ ಅಧಿಕಾರಿಗಳು ತಕ್ಷಣ ಸರಿಪಡಿಸುತ್ತಾರೆ.",
+        heroCtaReport: "ತಕ್ಷಣ ವರದಿ ಮಾಡಿ",
+        heroCtaCalc: "ಇಂಗಾಲದ ಉಳಿತಾಯ ಲೆಕ್ಕಹಾಕಿ",
+        labelCardWater: "ಉಳಿಸಿದ ನೀರು",
+        labelCardPower: "ಉಳಿಸಿದ ವಿದ್ಯುತ್",
+        labelCardFixed: "ಬಗೆಹರಿದ ಸಮಸ್ಯೆಗಳು",
+        labelCardCo2: "ತಡೆದ CO₂ ಪ್ರಮಾಣ",
+        tagReportForm: "ಸಾರ್ವಜನಿಕ ಸಂಪನ್ಮೂಲ ರಕ್ಷಣೆ",
+        titleReportForm: "ನೀರು, ವಿದ್ಯುತ್ ಅಥವಾ ಹವಾಮಾನ ಸಮಸ್ಯೆಯನ್ನು ವರದಿ ಮಾಡಿ",
+        descReportForm: "ಒಡೆದ ಪೈಪ್ ಅಥವಾ ವ್ಯರ್ಥವಾಗುತ್ತಿರುವ ಸಂಪನ್ಮೂಲ ಕಂಡರೆ ಈ 20 ಸೆಕೆಂಡಿನ ಫಾರ್ಮ್ ಭರ್ತಿ ಮಾಡಿ. ಸಂಬಂಧಪಟ್ಟ ಸಿಬ್ಬಂದಿಗೆ ಮಾಹಿತಿ ತಲುಪುತ್ತದೆ.",
+        labelFormCat: "1. ಸಮಸ್ಯೆಯ ವಿಧವನ್ನು ಆರಿಸಿ",
+        labelFormSeverity: "2. ತುರ್ತು ಮಟ್ಟ ಮತ್ತು ಪ್ರಮಾಣ",
+        labelFormLocation: "3. ನಿಖರವಾದ ಸ್ಥಳ / ವಿಳಾಸ",
+        btnAutoGps: "ಜಿಪಿಎಸ್ ಮೂಲಕ ಜಾಗ ಪತ್ತೆ",
+        labelFormPhoto: "4. ಫೋಟೋ ಲಗತ್ತಿಸಿ (ಮೊಬೈಲ್ ಕ್ಯಾಮೆರಾ)",
+        textTapCamera: "ಫೋಟೋ ತೆಗೆಯಲು ಅಥವಾ ಅಪ್‌ಲೋಡ್ ಮಾಡಲು ಇಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ",
+        labelFormNotes: "5. ಹೆಚ್ಚಿನ ವಿವರಗಳು",
+        btnSubmitForm: "ವಾರ್ಡ್ ಸಿಬ್ಬಂದಿಗೆ ವರದಿ ಸಲ್ಲಿಸಿ",
+        msgSuccessTitle: "ನಿಮ್ಮ ವರದಿ ಯಶಸ್ವಿಯಾಗಿ ದಾಖಲಾಗಿದೆ!",
+        msgSuccessBody: "ಟಿಕೆಟ್ ರಚಿಸಲಾಗಿದೆ. ಸ್ಥಳೀಯ ನಿರ್ವಹಣಾ ಸಿಬ್ಬಂದಿಗೆ ಮಾಹಿತಿ ರವಾನಿಸಲಾಗಿದೆ.",
+        tagAnalytics: "ಸಂಪನ್ಮೂಲ ದತ್ತಾಂಶ",
+        titleAnalytics: "ಸಮುದಾಯದ ಸಂಪನ್ಮೂಲ ಉಳಿತಾಯ ಮತ್ತು ಅಂಕಿಅಂಶಗಳು",
+        titleChart1: "ವಾರದಲ್ಲಿ ಜನರ ವರದಿಗಳಿಂದ ಉಳಿಸಲಾದ ನೀರು (ಲೀಟರ್‌ಗಳಲ್ಲಿ)",
+        titleChart2: "ವರದಿಯಾದ ಸಮಸ್ಯೆಗಳ ವಿಂಗಡಣೆ",
+        subtitleChart2: "ಸಮುದಾಯದ ವಿವಿಧ ಸಮಸ್ಯೆಗಳ ಪಾಲು",
+        tagCalcSection: "ಉಳಿತಾಯ ಲೆಕ್ಕಾಚಾರ",
+        titleCalcSection: "ಸ್ಮಾರ್ಟ್ ಇಂಗಾಲ ಮತ್ತು ಸಂಪನ್ಮೂಲ ಉಳಿತಾಯ ಕ್ಯಾಲ್ಕುಲೇಟರ್",
+        descCalcSection: "ಸಣ್ಣಪುಟ್ಟ ಸೋರಿಕೆ ನಿಲ್ಲಿಸುವುದರಿಂದ ಮತ್ತು ವ್ಯರ್ಥ ದೀಪ ಆರಿಸುವುದರಿಂದ ಎಷ್ಟು ನೈಸರ್ಗಿಕ ಸಂಪನ್ಮೂಲ ಉಳಿಯುತ್ತದೆ ಎಂದು ತಿಳಿಯಿರಿ.",
+        labelCalcPeople: "ಕ್ಯಾಂಪಸ್ ಅಥವಾ ಮನೆಯ ಜನರ ಸಂಖ್ಯೆ",
+        hintCalcPeople: "ನಿವಾಸಿಗಳು, ವಿದ್ಯಾರ್ಥಿಗಳು ಅಥವಾ ಸಿಬ್ಬಂದಿ",
+        labelCalcLeaks: "ಸರಿಪಡಿಸಿದ ಸೋರುವ ನಲ್ಲಿಗಳ ಸಂಖ್ಯೆ",
+        hintCalcLeaks: "1 ನಲ್ಲಿ = ದಿನಕ್ಕೆ ಸುಮಾರು 40 ಲೀಟರ್ ನೀರು ವ್ಯರ್ಥ",
+        labelCalcHours: "ವ್ಯರ್ಥ ವಿದ್ಯುತ್ ನಿಲ್ಲಿಸಿದ ಗಂಟೆಗಳು",
+        hintCalcHours: "ಹಗಲಿನ ದೀಪಗಳು, ಮೋಟಾರು ಮತ್ತು ಫ್ಯಾನ್‌ಗಳು",
+        labelResWater: "ತಿಂಗಳಲ್ಲಿ ಉಳಿದ ನೀರು",
+        labelResPower: "ತಿಂಗಳಲ್ಲಿ ಉಳಿದ ವಿದ್ಯುತ್",
+        labelResCo2: "ವರ್ಷದಲ್ಲಿ ತಡೆದ CO₂ ಇಂಗಾಲ",
+        tagFeed: "ನೈಜ ಕ್ರಮಗಳ ವಿವರ",
+        titleFeed: "ಸಮುದಾಯದ ಕ್ರಮಗಳ ಲೈವ್ ಪಟ್ಟಿ",
+        titleNoHardware: "ದುಬಾರಿ ಉಪಕರಣವಿಲ್ಲದೆ EcoPulse ಹೇಗೆ ಯಶಸ್ವಿಯಾಗುತ್ತದೆ?",
+        hwCol1Title: "1. ಸಾರ್ವಜನಿಕರ ಸಹಭಾಗಿತ್ವ",
+        hwCol1Desc: "ಪ್ರತಿಯೊಬ್ಬ ನಾಗರಿಕನ ಬಳಿ ಜಿಪಿಎಸ್ ಇರುವ ಮೊಬೈಲ್ ಕ್ಯಾಮೆರಾ ಇದೆ, ಇದು ದೊಡ್ಡ ಸಂವೇದಕ ಜಾಲದಂತೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ.",
+        hwCol2Title: "2. ಬುದ್ಧಿವಂತ ಅಲ್ಗಾರಿದಮ್",
+        hwCol2Desc: "ನೀರು ಪೋಲಾಗುವ ಪ್ರಮಾಣವನ್ನು ತಕ್ಷಣವೇ ಅಂದಾಜಿಸಿ ಮುಖ್ಯ ಸಮಸ್ಯೆಗಳಿಗೆ ಮೊದಲ ಪ್ರಾಶಸ್ತ್ಯ ನೀಡುತ್ತದೆ.",
+        hwCol3Title: "3. ಶೀಘ್ರ ಪರಿಹಾರ",
+        hwCol3Desc: "ವಾರ್ಡ್ ಪ್ಲಂಬರ್ ಮತ್ತು ನಿರ್ವಹಣಾ ಸಿಬ್ಬಂದಿಗೆ ನೇರವಾಗಿ ಸಂದೇಶ ಹೋಗಿ ಗಂಟೆಗಳಲ್ಲಿ ಸಮಸ್ಯೆ ಬಗೆಹರಿಯುತ್ತದೆ.",
+        voiceText: "ಇಕೋಪಲ್ಸ್ ವೇದಿಕೆಗೆ ಸ್ವಾಗತ. ನಿಮ್ಮ ಊರಿನಲ್ಲಿ ನೀರು ಸೋರಿಕೆ ಅಥವಾ ವಿದ್ಯುತ್ ಪೋಲಾಗುತ್ತಿದ್ದರೆ ಸುಲಭವಾಗಿ ಇಲ್ಲಿ ವರದಿ ಮಾಡಿ."
+      },
+      hi: {
+        navSubtitle: "सामुदायिक जलवायु और संसाधन संरक्षण मंच",
+        btnVoiceLabel: "ध्वनि गाइड",
+        btnPitchLabel: "3-मिनट पिच गाइड",
+        navBtnReport: "समस्या दर्ज करें",
+        heroBadgeText: "100% स्मार्टफोन आधारित • किसी हार्डवेयर की जरूरत नहीं",
+        heroHeadline: "नागरिकों द्वारा संचालित जल और ऊर्जा संरक्षण।",
+        heroSummary: "टूटे पाइप, दिन में जलती स्ट्रीटलाइट और कचरे को जलने से रोकें। अपने फोन से फोटो खींचकर सीधे वार्ड टीम को अलर्ट भेजें।",
+        heroCtaReport: "तुरंत रिपोर्ट करें",
+        heroCtaCalc: "कार्बन बचत गणना करें",
+        labelCardWater: "बचाया गया पानी",
+        labelCardPower: "बचाई गई बिजली",
+        labelCardFixed: "हल की गई समस्याएं",
+        labelCardCo2: "रोका गया CO₂",
+        tagReportForm: "नागरिक संसाधन सुरक्षा",
+        titleReportForm: "पानी, बिजली या पर्यावरण समस्या दर्ज करें",
+        descReportForm: "लीकेज या ऊर्जा बर्बादी की 20 सेकंड में रिपोर्ट करें। हमारी प्रणाली तुरंत संबंधित अधिकारियों को सूचित करती है।",
+        labelFormCat: "1. समस्या की श्रेणी चुनें",
+        labelFormSeverity: "2. तात्कालिकता और अनुमानित बर्बादी",
+        labelFormLocation: "3. सटीक स्थान / पता",
+        btnAutoGps: "जीपीएस द्वारा स्थान खोजें",
+        labelFormPhoto: "4. फोटो प्रमाण (कैमरा या गैलरी)",
+        textTapCamera: "फोटो लेने या अपलोड करने के लिए क्लिक करें",
+        labelFormNotes: "5. अतिरिक्त विवरण",
+        btnSubmitForm: "वार्ड टीम को शिकायत भेजें",
+        msgSuccessTitle: "शिकायत सफलतापूर्वक दर्ज हो गई!",
+        msgSuccessBody: "टिकट संख्या आवंटित की गई। रखरखाव टीम को सूचित कर दिया गया है।",
+        tagAnalytics: "संसाधन डेटा",
+        titleAnalytics: "सामुदायिक संसाधन बचत और विश्लेषण",
+        titleChart1: "नागरिकों द्वारा साप्ताहिक बचाया गया पानी (लीटर में)",
+        titleChart2: "श्रेणी के अनुसार दर्ज समस्याएं",
+        subtitleChart2: "विभिन्न प्रकार की बर्बादी का अनुपात",
+        tagCalcSection: "प्रभाव का ऑडिट",
+        titleCalcSection: "स्मार्ट कार्बन और संसाधन बचत कैलकुलेटर",
+        descCalcSection: "लीकेज ठीक करने और दिन में लाइट बंद करने से होने वाली प्राकृतिक बचत की गणना करें।",
+        labelCalcPeople: "परिवार या परिसर के सदस्य",
+        hintCalcPeople: "निवासी, छात्र या कर्मचारी संख्या",
+        labelCalcLeaks: "ठीक किए गए नलों की संख्या",
+        hintCalcLeaks: "1 नल = प्रतिदिन लगभग 40 लीटर पानी का नुकसान",
+        labelCalcHours: "बचाए गए बिजली के घंटे",
+        hintCalcHours: "दिन की लाइटें और गैर-जरूरी पंखे",
+        labelResWater: "मासिक बचाया गया पानी",
+        labelResPower: "मासिक बचाई गई बिजली",
+        labelResCo2: "वार्षिक रोकी गई कार्बन डाईऑक्साइड",
+        tagFeed: "सत्यापित सामुदायिक कार्य",
+        titleFeed: "सक्रिय सामुदायिक एक्शन सूची",
+        titleNoHardware: "महंगे हार्डवेयर के बिना EcoPulse कैसे काम करता है?",
+        hwCol1Title: "1. नागरिकों की भागीदारी",
+        hwCol1Desc: "हर नागरिक के पास जीपीएस युक्त स्मार्टफोन है जो एक सेंसर नेटवर्क की तरह कार्य करता है।",
+        hwCol2Title: "2. बुद्धिमान एल्गोरिदम",
+        hwCol2Desc: "सिस्टम नुकसान का आकलन करके गंभीर समस्याओं को प्राथमिकता पर रखता है।",
+        hwCol3Title: "3. त्वरित समाधान",
+        hwCol3Desc: "वार्ड कर्मचारियों को सीधे सूचना मिलने से समस्या घंटों में हल हो जाती है।",
+        voiceText: "इको पल्स में आपका स्वागत है। आप अपने समुदाय में पानी के रिसाव और बिजली की बर्बादी की आसानी से रिपोर्ट कर सकते हैं।"
+      },
+      ta: {
+        navSubtitle: "சமூக காலநிலை மற்றும் வள பாதுகாப்பு தளம்",
+        btnVoiceLabel: "குரல் வழிகாட்டி",
+        btnPitchLabel: "3-நிமிட பிட்ச் கையேடு",
+        navBtnReport: "புகார் அளிக்கவும்",
+        heroBadgeText: "100% ஸ்மார்ட்போன் இயக்கம் • கூடுதல் உபகரணம் தேவையில்லை",
+        heroHeadline: "பொதுமக்கள் பங்களிப்புடன் நீர் மற்றும் ஆற்றல் பாதுகாப்பு.",
+        heroSummary: "உடைந்த குழாய்கள், பகலில் எரியும் தெருவிளக்குகள் மற்றும் குப்பை எரிப்பதை உங்கள் கைபேசி மூலம் உடனே புகார் செய்யுங்கள்.",
+        heroCtaReport: "உடனே புகார் செய்க",
+        heroCtaCalc: "கார்பன் சேமிப்பு கணக்கீடு",
+        labelCardWater: "சேமித்த நீர்",
+        labelCardPower: "சேமித்த மின்சாரம்",
+        labelCardFixed: "தீர்க்கப்பட்ட சிக்கல்கள்",
+        labelCardCo2: "தடுக்கப்பட்ட CO₂",
+        tagReportForm: "சமூக வள மீட்பு",
+        titleReportForm: "நீர், மின்சாரம் அல்லது சுற்றுச்சூழல் சிக்கலை புகாரளிக்கவும்",
+        descReportForm: "20 வினாடிகளில் உங்கள் புகாரைப் பதிவு செய்யுங்கள். நகராட்சி பராமரிப்புக் குழு உடனே நடவடிக்கை எடுக்கும்.",
+        labelFormCat: "1. சிக்கலின் வகையைத் தேர்ந்தெடுக்கவும்",
+        labelFormSeverity: "2. அவசர நிலை மற்றும் இழப்பு அளவு",
+        labelFormLocation: "3. சரியான இடம் / முகவரி",
+        btnAutoGps: "ஜிபிஎஸ் மூலம் இடம் கண்டறி",
+        labelFormPhoto: "4. புகைப்பட ஆதாரம்",
+        textTapCamera: "புகைப்படம் எடுக்க அல்லது பதிவேற்ற தட்டவும்",
+        labelFormNotes: "5. கூடுதல் விவரங்கள்",
+        btnSubmitForm: "புகாரை சமர்ப்பிக்கவும்",
+        msgSuccessTitle: "புகார் வெற்றிகரமாகப் பதிவு செய்யப்பட்டது!",
+        msgSuccessBody: "டிக்கெட் உருவாக்கப்பட்டது. உள்ளூர் பராமரிப்பு குழுவிற்கு தகவல் அனுப்பப்பட்டுள்ளது.",
+        tagAnalytics: "வள பகுப்பாய்வு",
+        titleAnalytics: "சமூக வள சேமிப்பு மற்றும் புள்ளிவிவரங்கள்",
+        titleChart1: "வாராந்திர சேமிக்கப்பட்ட நீர் (லிட்டரில்)",
+        titleChart2: "வகைகள் வாரியாக சிக்கல்கள்",
+        subtitleChart2: "சமூக புகார்களின் விகிதம்",
+        tagCalcSection: "சேமிப்பு கணக்கீடு",
+        titleCalcSection: "ஸ்மார்ட் கார்பன் மற்றும் வள சேமிப்பு கால்குலேட்டர்",
+        descCalcSection: "குழாய் கசிவை சரிசெய்வதன் மூலமும் மின்சாரத்தை மிச்சப்படுத்துவதன் மூலமும் ஏற்படும் நன்மையை கணக்கிடுங்கள்.",
+        labelCalcPeople: "வளாகம் அல்லது குடும்ப உறுப்பினர்கள்",
+        hintCalcPeople: "குடியிருப்பாளர்கள் அல்லது மாணவர்கள் எண்ணிக்கை",
+        labelCalcLeaks: "சரிசெய்யப்பட்ட குழாய்கள்",
+        hintCalcLeaks: "1 குழாய் = ஒரு நாளைக்கு 40 லிட்டர் வீணாகிறது",
+        labelCalcHours: "மிச்சப்படுத்தப்பட்ட மின்சார நேரம்",
+        hintCalcHours: "பகல் விளக்குகள் மற்றும் தேவையில்லாத சாதனங்கள்",
+        labelResWater: "மாதாந்திர சேமித்த நீர்",
+        labelResPower: "மாதாந்திர சேமித்த மின்சாரம்",
+        labelResCo2: "ஆண்டுக்கு குறைக்கப்பட்ட CO₂",
+        tagFeed: "சரிபார்க்கப்பட்ட சமூக நடவடிக்கைகள்",
+        titleFeed: "நேரடி சமூக நடவடிக்கை பதிவு",
+        titleNoHardware: "விலையுயர்ந்த சாதனங்கள் இல்லாமல் EcoPulse எவ்வாறு இயங்குகிறது?",
+        hwCol1Title: "1. மக்கள் பங்களிப்பு",
+        hwCol1Desc: "ஒவ்வொரு குடிமகனிடமும் உள்ள ஜிபிஎஸ் ஸ்மார்ட்போன் பரவலான சென்சார் வலையமைப்பாக செயல்படுகிறது.",
+        hwCol2Title: "2. புத்திசாலி அல்காரிதம்",
+        hwCol2Desc: "இழப்பீட்டின் தீவிரத்தை அறிந்து முக்கிய பிரச்சனைகளை முன்னுரிமைப்படுத்துகிறது.",
+        hwCol3Title: "3. விரைவான தீர்வு",
+        hwCol3Desc: "நகராட்சி ஊழியர்கள் உடனடியாக சென்று சில மணிநேரங்களில் பிரச்சனையை தீர்க்கிறார்கள்.",
+        voiceText: "ஈகோபல்ஸுக்கு நல்வரவு. உங்கள் பகுதியில் நீர் கசிவு அல்லது மின்சார விரயத்தை எளிதாக புகார் செய்யலாம்."
+      },
+      te: {
+        navSubtitle: "సమాజ పర్యావరణ మరియు వనరుల రక్షణ వేదిక",
+        btnVoiceLabel: "వాయిస్ గైడ్",
+        btnPitchLabel: "3-నిమిషాల పిచ్ గైడ్",
+        navBtnReport: "సమస్యను నివేదించండి",
+        heroBadgeText: "100% స్మార్ట్‌ఫోన్ ఆధారితం • అదనపు హార్డ్‌వేర్ అవసరం లేదు",
+        heroHeadline: "ప్రజల భాగస్వామ్యంతో నీరు మరియు విద్యుత్ సంరక్షణ.",
+        heroSummary: "లీకేజీ పైపులు, పగటిపూట వెలిగే వీధి దీపాలు మరియు వ్యర్థాలను కాల్చడాన్ని మొబైల్ ద్వారా ఫొటో తీసి వెంటనే నివేదించండి.",
+        heroCtaReport: "వెంటనే నివేదించండి",
+        heroCtaCalc: "కార్బన్ ఆదా లెక్కించండి",
+        labelCardWater: "ఆదా చేసిన నీరు",
+        labelCardPower: "ఆదా చేసిన విద్యుత్",
+        labelCardFixed: "పరిష్కరించిన సమస్యలు",
+        labelCardCo2: "నివారించిన CO₂",
+        tagReportForm: "వనరుల రక్షణ",
+        titleReportForm: "నీరు లేదా విద్యుత్ వృథా సమస్యను నమోదు చేయండి",
+        descReportForm: "20 సెకన్లలో మీ ఫిర్యాదును నమోదు చేయండి. మునిసిపల్ సిబ్బంది వెంటనే చర్యలు తీసుకుంటారు.",
+        labelFormCat: "1. సమస్య వర్గాన్ని ఎంచుకోండి",
+        labelFormSeverity: "2. తీవ్రత మరియు వృథా అంచనా",
+        labelFormLocation: "3. ఖచ్చితమైన స్థలం / చిరునామా",
+        btnAutoGps: "జీపీఎస్ ద్వారా స్థానం గుర్తించండి",
+        labelFormPhoto: "4. ఫొటో సాక్ష్యం (కెమెరా / గ్యాలరీ)",
+        textTapCamera: "ఫొటో తీయడానికి లేదా అప్‌లోడ్ చేయడానికి క్లిక్ చేయండి",
+        labelFormNotes: "5. అదనపు వివరాలు",
+        btnSubmitForm: "వార్డు సిబ్బందికి నివేదిక పంపండి",
+        msgSuccessTitle: "ఫిర్యాదు విజయవంతంగా నమోదైంది!",
+        msgSuccessBody: "టిక్కెట్ కేటాయించబడింది. నిర్వహణ సిబ్బందికి సమాచారం పంపబడింది.",
+        tagAnalytics: "వనరుల విశ్లేషణ",
+        titleAnalytics: "కమ్యూనిటీ వనరుల ఆదా మరియు విశ్లేషణలు",
+        titleChart1: "ప్రజల చర్యల ద్వారా వారంలో ఆదా చేసిన నీరు (లీటర్లలో)",
+        titleChart2: "వర్గాల వారీగా నమోదైన సమస్యలు",
+        subtitleChart2: "వివిధ సమస్యల శాతం పంపిణీ",
+        tagCalcSection: "ఆదా లెక్కింపు",
+        titleCalcSection: "స్మార్ట్ కార్బన్ మరియు వనరుల ఆదా కాలిక్యులేటర్",
+        descCalcSection: "పైపుల లీకేజీ అరికట్టడం ద్వారా ఎంత సహజ వనరులు ఆదా అవుతాయో తెలుసుకోండి.",
+        labelCalcPeople: "క్యాంపస్ లేదా కుటుంబ సభ్యులు",
+        hintCalcPeople: "నివాసితులు లేదా విద్యార్థుల సంఖ్య",
+        labelCalcLeaks: "సరిచేసిన నల్లాలు / పైపులు",
+        hintCalcLeaks: "1 నల్లా = రోజుకు సుమారు 40 లీటర్ల నీరు వృథా",
+        labelCalcHours: "ఆదా చేసిన విద్యుత్ గంటలు",
+        hintCalcHours: "పగటి దీపాలు మరియు అనవసర ఉపకరణాలు",
+        labelResWater: "నెలవారీ ఆదా చేసిన నీరు",
+        labelResPower: "నెలవారీ ఆదా చేసిన విద్యుత్",
+        labelResCo2: "వార్షికంగా నివారించిన CO₂",
+        tagFeed: "కమ్యూనిటీ చర్యల వివరాలు",
+        titleFeed: "లైవ్ సిటిజన్ యాక్షన్ లాగ్",
+        titleNoHardware: "ఖరీదైన పరికరాలు లేకుండా EcoPulse ఎలా పనిచేస్తుంది?",
+        hwCol1Title: "1. ప్రజల సహకారం",
+        hwCol1Desc: "ప్రతి పౌరుడి వద్ద ఉన్న స్మార్ట్‌ఫోన్ ఒక సెన్సార్ నెట్‌వర్క్ లాగా పనిచేస్తుంది.",
+        hwCol2Title: "2. ఇంటెలిజెంట్ అల్గోరిథం",
+        hwCol2Desc: "నష్టం తీవ్రతను అంచనా వేసి ముఖ్య సమస్యలకు మొదటి ప్రాధాన్యత ఇస్తుంది.",
+        hwCol3Title: "3. వేగవంతమైన పరిష్కారం",
+        hwCol3Desc: "వార్డు సిబ్బందికి నేరుగా సమాచారం చేరి గంటల వ్యవధిలోనే పరిష్కారం లభిస్తుంది.",
+        voiceText: "ఇకోపల్స్‌కు స్వాగతం. మీ ప్రాంతంలో నీటి లీకేజీ లేదా విద్యుత్ వృథాను సులభంగా ఇక్కడ నివేదించవచ్చు."
+      },
+      ml: {
+        navSubtitle: "കമ്മ്യൂണിറ്റി പരിസ്ഥിതി സംരക്ഷണ പ്ലാറ്റ്ഫോം",
+        btnVoiceLabel: "വോയ്‌സ് ഗൈഡ്",
+        btnPitchLabel: "3-മിനിറ്റ് പിച്ച് ഗൈഡ്",
+        navBtnReport: "പരാതി നൽകുക",
+        heroBadgeText: "100% സ്മാർട്ട്‌ഫോൺ അധിഷ്ഠിതം • ഹാർഡ്‌വെയർ ആവശ്യമില്ല",
+        heroHeadline: "പൊതുജന പങ്കാളിത്തത്തോടെ ജല-ഊർജ്ജ സംരക്ഷണം.",
+        heroSummary: "പൈപ്പ് ചോർച്ച, പകൽ കത്തുന്ന തെരുവ് വിളക്കുകൾ എന്നിവ മൊബൈൽ വഴി ഫോട്ടോ എടുത്ത് റിപ്പോർട്ട് ചെയ്യുക. ഉദ്യോഗസ്ഥർ ഉടൻ നടപടിയെടുക്കും.",
+        heroCtaReport: "ഉടൻ റിപ്പോർട്ട് ചെയ്യുക",
+        heroCtaCalc: "കാർബൺ ലാഭം കണക്കാക്കുക",
+        labelCardWater: "സംരക്ഷിച്ച ജലം",
+        labelCardPower: "സംരക്ഷിച്ച ഊർജ്ജം",
+        labelCardFixed: "പരിഹരിച്ച പ്രശ്നങ്ങൾ",
+        labelCardCo2: "തടഞ്ഞ CO₂",
+        tagReportForm: "വിഭവ സംരക്ഷണം",
+        titleReportForm: "ജല, ഊർജ്ജ പാഴാക്കലുകൾ റിപ്പോർട്ട് ചെയ്യുക",
+        descReportForm: "20 സെക്കൻഡിനുള്ളിൽ പ്രശ്നങ്ങൾ റിപ്പോർട്ട് ചെയ്യുക. തദ്ദേശ ഉദ്യോഗസ്ഥർ ഉടൻ പരിഹരിക്കും.",
+        labelFormCat: "1. പ്രശ്നത്തിന്റെ വിഭാഗം തിരഞ്ഞെടുക്കുക",
+        labelFormSeverity: "2. അടിയന്തിര പ്രാധാന്യവും തോതും",
+        labelFormLocation: "3. കൃത്യമായ സ്ഥലം / വിലാസം",
+        btnAutoGps: "ജി.പി.എസ് വഴി സ്ഥലം കണ്ടെത്തുക",
+        labelFormPhoto: "4. ഫോട്ടോ തെളിവ് (ക്യാമറ / ഗാലറി)",
+        textTapCamera: "ഫോട്ടോ എടുക്കാൻ ഇവിടെ ക്ലിക്ക് ചെയ്യുക",
+        labelFormNotes: "5. കൂടുതൽ വിവരങ്ങൾ",
+        btnSubmitForm: "പരാതി സമർപ്പിക്കുക",
+        msgSuccessTitle: "പരാതി വിജയകരമായി രജിസ്റ്റർ ചെയ്തു!",
+        msgSuccessBody: "ടിക്കറ്റ് നമ്പർ ലഭിച്ചു. അറ്റകുറ്റപ്പണി ജീവനക്കാരെ അറിയിച്ചിട്ടുണ്ട്.",
+        tagAnalytics: "വിഭവ വിശകലനം",
+        titleAnalytics: "കമ്മ്യൂണിറ്റി വിഭവ സംരക്ഷണ കണക്കുകൾ",
+        titleChart1: "ആഴ്ചതോറും സംരക്ഷിച്ച ജലം (ലിറ്ററിൽ)",
+        titleChart2: "പ്രശ്നങ്ങളുടെ വർഗ്ഗീകരണം",
+        subtitleChart2: "വിവിധ പരാതികളുടെ ശതമാനം",
+        tagCalcSection: "ലാഭം കണക്കാക്കൽ",
+        titleCalcSection: "സ്മാർട്ട് കാർബൺ വിഭവ സംരക്ഷണ കാൽക്കുലേറ്റർ",
+        descCalcSection: "ചെറിയ ചോർച്ചകൾ പരിഹരിക്കുന്നതിലൂടെ എത്രത്തോളം ജലവും ഊർജ്ജവും ലാഭിക്കാമെന്ന് മനസ്സിലാക്കുക.",
+        labelCalcPeople: "കുടുംബം അല്ലെങ്കിൽ കാമ്പസ് അംഗങ്ങൾ",
+        hintCalcPeople: "താമസക്കാരുടെ അല്ലെങ്കിൽ വിദ്യാർത്ഥികളുടെ എണ്ണം",
+        labelCalcLeaks: "ശരിയാക്കിയ പൈപ്പുകൾ / ടാപ്പുകൾ",
+        hintCalcLeaks: "1 ടാപ്പ് = പ്രതിദിനം 40 ലിറ്റർ വെള്ളം നഷ്ടപ്പെടുന്നു",
+        labelCalcHours: "ലാഭിച്ച വൈദ്യുതി മണിക്കൂറുകൾ",
+        hintCalcHours: "പകൽ വിളക്കുകളും അനാവശ്യ ഉപകരണങ്ങളും",
+        labelResWater: "മാസം തോറും സംരക്ഷിച്ച ജലം",
+        labelResPower: "മാസം തോറും സംരക്ഷിച്ച വൈദ്യുതി",
+        labelResCo2: "പ്രതിവർഷം തടഞ്ഞ കാർബൺ",
+        tagFeed: "നടപടി വിവരങ്ങൾ",
+        titleFeed: "തത്സമയ പ്രവർത്തന വിവരങ്ങൾ",
+        titleNoHardware: "ചെലവേറിയ ഉപകരണങ്ങളില്ലാതെ EcoPulse എങ്ങനെ പ്രവർത്തിക്കുന്നു?",
+        hwCol1Title: "1. ജനകീയ പങ്കാളിത്തം",
+        hwCol1Desc: "ഓരോ പൗരന്റെയും കൈയിലുള്ള സ്മാർട്ട്‌ഫോൺ ഒരു സെൻസർ ശൃംഖല പോലെ പ്രവർത്തിക്കുന്നു.",
+        hwCol2Title: "2. ഇന്റലിജന്റ് അൽഗോരിതം",
+        hwCol2Desc: "നഷ്ടത്തിന്റെ തോത് കണക്കാക്കി പ്രധാന പ്രശ്നങ്ങൾക്ക് മുൻഗണന നൽകുന്നു.",
+        hwCol3Title: "3. വേഗത്തിലുള്ള പരിഹാരം",
+        hwCol3Desc: "വാർഡ് ജീവനക്കാരിലേക്ക് വിവരമെത്തി മണിക്കൂറുകൾക്കുള്ളിൽ പ്രശ്നങ്ങൾ പരിഹരിക്കപ്പെടുന്നു.",
+        voiceText: "ഇക്കോപൾസിലേക്ക് സ്വാഗതം. നിങ്ങളുടെ പ്രദേശത്തെ ജല ചോർച്ചയോ വൈദ്യുതി പാഴാക്കലോ എളുപ്പത്തിൽ ഇവിടെ റിപ്പോർട്ട് ചെയ്യാം."
+      }
+    };
+
+    let activeLang = 'kn';
+    let weeklyChartInstance = null;
+    let categoryChartInstance = null;
+
+    // Switch Language Dynamically across all UI tags
+    function switchLanguage(lang) {
+      activeLang = lang;
+      const dict = i18n[lang];
+      if (!dict) return;
+
+      for (const [key, text] of Object.entries(dict)) {
+        const el = document.getElementById(key);
+        if (el) {
+          el.innerText = text;
+        }
+      }
+
+      // Update button text directly
+      const submitBtnSpan = document.querySelector('#btnSubmitForm span');
+      if (submitBtnSpan && dict.btnSubmitForm) {
+        submitBtnSpan.innerText = dict.btnSubmitForm;
+      }
+    }
+
+    // Text to Speech Voice Synthesizer
+    function speakVoiceGuide() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const text = i18n[activeLang].voiceText;
+        const msg = new SpeechSynthesisUtterance(text);
+        
+        const langCodeMap = {
+          en: 'en-US',
+          kn: 'kn-IN',
+          hi: 'hi-IN',
+          ta: 'ta-IN',
+          te: 'te-IN',
+          ml: 'ml-IN'
+        };
+        msg.lang = langCodeMap[activeLang] || 'en-US';
+        msg.rate = 0.95;
+        window.speechSynthesis.speak(msg);
+      } else {
+        alert(i18n[activeLang].voiceText);
+      }
+    }
+
+    // GPS Auto Detection
+    function detectUserLocation() {
+      const btn = document.getElementById('btnAutoGps');
+      const badge = document.getElementById('gpsLockedBadge');
+      const input = document.getElementById('formLocation');
+
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Finding...`;
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const lat = pos.coords.latitude.toFixed(4);
+            const lng = pos.coords.longitude.toFixed(4);
+            input.value = `Geo-Tag: Lat ${lat}, Lng ${lng} (Ward 174, Bengaluru)`;
+            btn.innerHTML = `<i class="fa-solid fa-check"></i> Found`;
+            badge.classList.remove('hidden');
+          },
+          () => {
+            input.value = `Sector 7, Near Central Water Reservoir, Bengaluru`;
+            btn.innerHTML = `<i class="fa-solid fa-check"></i> Set (Default)`;
+            badge.classList.remove('hidden');
+          }
+        );
+      } else {
+        input.value = `Main Campus Road, Block 4`;
+        badge.classList.remove('hidden');
+      }
+    }
+
+    // Photo Preview
+    function previewUploadedImage(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('previewImg').src = e.target.result;
+          document.getElementById('dropPrompt').classList.add('hidden');
+          document.getElementById('previewContainer').classList.remove('hidden');
+          document.getElementById('previewImgMeta').innerText = `${file.name.substring(0, 18)}... (${(file.size / 1024).toFixed(0)} KB)`;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // Submit Grievance and update table + charts
+    function submitHazardReport(event) {
+      event.preventDefault();
+      const catText = document.getElementById('formCategory').selectedOptions[0].text;
+      const location = document.getElementById('formLocation').value;
+      const severity = document.getElementById('formSeverity').value;
+      const alertBox = document.getElementById('successNotification');
+
+      const ticketNumber = `#EP-${Math.floor(1000 + Math.random() * 9000)}`;
+
+      // Append row to top of incidents table
+      const tbody = document.getElementById('incidentsTable');
+      const tr = document.createElement('tr');
+      tr.className = 'hover:bg-slate-800/40 transition bg-emerald-500/10 border-l-4 border-emerald-400';
+      tr.innerHTML = `
+        <td class="py-3.5 px-4 font-mono font-bold text-emerald-400">${ticketNumber}</td>
+        <td class="py-3.5 px-4 text-white font-bold">${catText}</td>
+        <td class="py-3.5 px-4 text-slate-300">${location}</td>
+        <td class="py-3.5 px-4 text-cyan-300 font-mono">Assessing...</td>
+        <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 text-[10px] font-bold">New Ticket</span></td>
+        <td class="py-3.5 px-4 text-center">
+          <button onclick="upvoteIncident(this)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-emerald-400 text-xs font-bold transition">
+            <i class="fa-solid fa-thumbs-up"></i> <span>1</span>
+          </button>
+        </td>
+      `;
+      tbody.prepend(tr);
+
+      // Increment counters
+      const fixedEl = document.getElementById('counterResolved');
+      fixedEl.innerText = parseInt(fixedEl.innerText) + 1;
+
+      // Update Chart.js dataset dynamically
+      if (categoryChartInstance) {
+        categoryChartInstance.data.datasets[0].data[0] += 1;
+        categoryChartInstance.update();
+      }
+
+      // Show alert and scroll
+      alertBox.classList.remove('hidden');
+      alertBox.scrollIntoView({ behavior: 'smooth' });
+
+      // Reset form
+      document.getElementById('hazardForm').reset();
+      document.getElementById('dropPrompt').classList.remove('hidden');
+      document.getElementById('previewContainer').classList.add('hidden');
+      document.getElementById('gpsLockedBadge').classList.add('hidden');
+    }
+
+    // Upvote Button Counter
+    function upvoteIncident(btn) {
+      const span = btn.querySelector('span');
+      let val = parseInt(span.innerText);
+      span.innerText = val + 1;
+      btn.classList.add('bg-emerald-500/20', 'border', 'border-emerald-500/40');
+    }
+
+    // Interactive Sustainability & Carbon Calculator
+    function runCarbonCalculations() {
+      const people = parseInt(document.getElementById('calcPeopleInput').value) || 1;
+      const leaks = parseInt(document.getElementById('calcLeaksInput').value) || 0;
+      const idleHours = parseFloat(document.getElementById('calcHoursInput').value) || 0;
+
+      // Tap leak savings: 40L per tap per day * 30 days
+      const tapWaterSaved = leaks * 40 * 30;
+      // Habitual water conservation per person: 20L per day * 30 days
+      const habitWaterSaved = people * 20 * 30;
+      const totalWater = tapWaterSaved + habitWaterSaved;
+
+      // Power saved: 0.12 kWh per idle hour per person per day * 30 days
+      const monthlyPower = Math.round(people * idleHours * 0.12 * 30);
+
+      // Annual CO2 avoided in Metric Tons: ~0.82 kg CO2 per kWh grid factor
+      const annualCo2Tons = ((monthlyPower * 0.82 * 12) / 1000).toFixed(2);
+
+      document.getElementById('resWaterVal').innerText = `${totalWater.toLocaleString()} Liters`;
+      document.getElementById('resPowerVal').innerText = `${monthlyPower.toLocaleString()} kWh`;
+      document.getElementById('resCo2Val').innerText = `${annualCo2Tons} Tons`;
+    }
+
+    // 3-Minute Pitch Script Modal Toggle
+    function togglePitchModal(show) {
+      const modal = document.getElementById('pitchModal');
+      if (show) {
+        modal.classList.remove('hidden');
+      } else {
+        modal.classList.add('hidden');
+      }
+    }
+
+    // Chart.js Initializations
+    document.addEventListener('DOMContentLoaded', () => {
+      // Set default language view to Kannada
+      switchLanguage('kn');
+      runCarbonCalculations();
+
+      // Chart 1: Line Chart
+      const ctxWeekly = document.getElementById('weeklySavingsChart').getContext('2d');
+      weeklyChartInstance = new Chart(ctxWeekly, {
+        type: 'line',
+        data: {
+          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          datasets: [{
+            label: 'Water Conserved (Liters)',
+            data: [42000, 56000, 51000, 78000, 69000, 89000, 97000],
+            borderColor: '#22d3ee',
+            backgroundColor: 'rgba(34, 211, 238, 0.08)',
+            fill: true,
+            tension: 0.38,
+            borderWidth: 3,
+            pointBackgroundColor: '#22d3ee'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#94a3b8' } },
+            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+          }
+        }
+      });
+
+      // Chart 2: Doughnut Chart
+      const ctxCat = document.getElementById('categoryBreakdownChart').getContext('2d');
+      categoryChartInstance = new Chart(ctxCat, {
+        type: 'doughnut',
+        data: {
+          labels: ['Water Leaks', 'Daytime Lamps', 'Tank Overflow', 'AC Power Waste', 'Illegal Burning'],
+          datasets: [{
+            data: [44, 24, 18, 9, 5],
+            backgroundColor: ['#06b6d4', '#fbbf24', '#38bdf8', '#f59e0b', '#ef4444'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                boxWidth: 10,
+                color: '#cbd5e1',
+                font: { size: 10 }
+              }
+            }
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
